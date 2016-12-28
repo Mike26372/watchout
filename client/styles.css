@@ -2,4 +2,38 @@
 
 /* Note: an asteroid image is included in this repo.
 Feel free to use it if you like. */
+body {
+  font-family: 'Roboto', 'Helvetica Neue', sans-ser;
+  background-color: #d7dfef;
+}
 
+.header {
+  height: 70px;
+}
+
+.game {
+  border-top: 100px;
+  background-color: #fff;
+  padding: 3px;
+  border-radius: 5px;
+}
+
+.row {
+  /*margin: 2px;*/
+  margin-top: 10px;
+  /*margin-right: 3px;*/
+}
+
+.board {
+  height: 600px;
+  border: 1px solid black;
+  border-radius: 5px;
+  margin: 10px;
+}
+
+.scoreboard {
+  font-weight: bold;
+  border: 2px solid black;
+  border-radius: 5px;
+  /*margin: 3px;*/
+}
