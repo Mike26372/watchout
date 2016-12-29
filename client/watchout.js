@@ -5,9 +5,13 @@
 
 // Set watchout SVG height and width to equal current board
 // watchout.style('width', '' + width + 'px').style('height', '' + height + 'px');
+// window.require = require;
+// var d3 = require('d3');
+// var d3 = require('d3');
+// var d3Selection = require('d3-selection');
+// import * as d3 from 'lib/d3.node.js';
 
-var d3 = require('d3');
-// var d3 = require('lib/d3.node.js');
+var pi = 3.14159;
 
 var gameOptions = {
   height: 450,
@@ -45,8 +49,8 @@ class Player {
     this.gameOptions = gameOptions;
     this.path = 'm-7.5,1.62413c0,-5.04095 4.08318,-9.12413 9.12414,-9.12413c5.04096,0 9.70345,5.53145 11.87586,9.12413c-2.02759,2.72372 -6.8349,9.12415 -11.87586,9.12415c-5.04096,0 -9.12414,-4.08318 -9.12414,-9.12415z';
     this.fill = '#ff6600';
-    this.x = 0;
-    this.y = 0;
+    this.x = 350;
+    this.y = 225;
     this.angle = 0;
     this.r = 5;
 
@@ -68,48 +72,52 @@ class Player {
     var minX = this.gameOptions.padding;
     var maxX = this.gameOptions.width - this.gameOptions.padding;
     if (x <= minX) {
-      this.x = minX;
+      return this.x = minX;
     }
     if (x >= maxX) {
-      this.x = maxX;
+      return this.x = maxX;
     }
-    return this.x;
+    return this.x = x;
   }
   setY (y) {
     var minY = this.gameOptions.padding;
     var maxY = this.gameOptions.height - this.gameOptions.padding;
     if (y <= minY) {
-      this.y = minY;
+      return this.y = minY;
     }
     if (y >= maxY) {
-      this.y = maxY;
+      return this.y = maxY;
     }
-    return this.y;
+    return this.y = y;
   }
   transform (opts) {
     this.angle = opts.angle || this.angle;
     this.setX(opts.x || this.x);
     this.setY(opts.y || this.y);
-    this.el.attr('transform', `rotate(${this.angle}, ${this.getX()}, ${this.getY()}) translate(${this.getX()}, ${this.getY()})`);
+    return this.el.attr('transform', `rotate(${this.angle}, ${this.getX()}, ${this.getY()}) translate(${this.getX()}, ${this.getY()})`);
   }
   moveAbsolute (x, y) {
-    this.transform(x, y);
+    return this.transform(x, y);
   }
   moveRelative (dx, dy) {
-    this.transform({x: this.getX() + dx, y: this.getY() + dy, angle: 360 * ( Math.atan2(dy, dx) / (Math.PI() * 2) )});
+    return this.transform({x: this.getX() + dx, y: this.getY() + dy, angle: 360 * ( Math.atan2(dy, dx) / (pi * 2) )});
   }
   setupDragging () {
+    var context;
+    
+    context = window.players[0];
+    
     var dragMove = function () {
-      this.moveRelative(d3.event.dx, d3.event.dy);
+      // this.moveRelative.call(this, d3.event.dx, d3.event.dy);
+      context = window.players[0];
+      context.moveRelative(d3.event.dx, d3.event.dy);
     };
     var drag = d3.drag().on('drag', dragMove);
-    this.el.call(drag);
+    return this.el.call(drag);
   }
 }
 
 var players = [];
 players.push(new Player(gameOptions).render(gameBoard));
-players.push(new Player(gameOptions).render(gameBoard));
-
-
+// players.push(new Player(gameOptions).render(gameBoard));
 
