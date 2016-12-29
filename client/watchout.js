@@ -119,5 +119,93 @@ class Player {
 
 var players = [];
 players.push(new Player(gameOptions).render(gameBoard));
-// players.push(new Player(gameOptions).render(gameBoard));
+
+var createEnemies = function () {
+  _.range(0, gameOptions.enemies).map(function(value) {
+    return {
+      value: value,
+      x: Math.random() * 100,
+      y: Math.random() * 100
+    };
+  });
+};
+
+var render = function (enemyData) {
+  
+  enemies = gameBoard.selectAll('circle.enemy').data(enemyData, (data) => data.id);
+  
+  enemies.enter().append('svg:circle')
+                  .attr('class', 'enemy')
+                  .attr('cx', (enemy) => axes.x(enemy.x))
+                  .attr('cy', (enemy) => axes.y(enemy.y))
+                  .attr('r', 0);
+
+  enemies.exit().remove();
+
+  var checkCollision = function(enemy, collidedCallback) {
+    return _(players).each(function(player) {
+      var radiusSum, xDiff, yDiff, separation;
+      radiusSum = parseFloat(enemy.attr('r')) + player.r;
+      xDiff = parseFloat(enemy.attr('x') + player.x);
+      yDiff = parseFloat(enemy.attr('y') + player.y);
+
+      separation = Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2));
+      if (separation < radiusSum) {
+        return collidedCallback(player, enemy);
+      }
+    });
+  };
+
+  var onCollision = function() {
+    updateBestScore();
+    gameStats.score = 0;
+    updateScore();
+  };
+
+  var tweenWithCollisionDetection = function (endData) {
+    var enemy = d3.select(this);
+    
+    var startPos = {
+      x: parseFloat(enemy.attr('cx')),
+      y: parseFloat(enemy.attr('cy'))
+    };
+
+    var endPos = {
+      x: axes.x(endData.x),
+      y: axes.y(endData.y)
+    };
+
+    return function(t) {
+      var enemyNextPos;
+      checkCollision(enemy, onCollision);
+      enemyNextPos = {
+        x: startPos.x + (endPos.x - startPos.x) * t,
+        y: startPos.y + (endPos.y - startPos.y) * t
+      };
+      return enemy.attr('cx', enemyNextPos.x).attr('cy', enemyNextPos.y);
+    };
+  };
+  return enemies.transition()
+                .duration(500)
+                .attr('r', 10)
+                .transition()
+                .duration(2000)
+                .tween('custom', tweenWithCollisionDetection);
+};
+
+var play = function() {
+  var gameTurn = function() {
+    var newEnemyPositions = createNewEnemies();
+    render(newEnemyPositions); 
+  };
+
+  var increaseScore = function() {
+
+  };
+};
+
+
+
+
+
 
