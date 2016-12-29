@@ -11,5 +11,8 @@
   "bugs": {
     "url": "https://github.com/reactorcore/sprint.watchout/issues"
   },
-  "homepage": "https://github.com/reactorcore/sprint.watchout"
+  "homepage": "https://github.com/reactorcore/sprint.watchout",
+  "devDependencies": {
+    "webpack": "^1.14.0"
+  }
 }

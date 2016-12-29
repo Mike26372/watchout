@@ -6,10 +6,13 @@
 // Set watchout SVG height and width to equal current board
 // watchout.style('width', '' + width + 'px').style('height', '' + height + 'px');
 
+var d3 = require('d3');
+// var d3 = require('lib/d3.node.js');
+
 var gameOptions = {
   height: 450,
   width: 700,
-  nEnemies: 30,
+  enemies: 30,
   padding: 20
 };
 
@@ -70,6 +73,7 @@ class Player {
     if (x >= maxX) {
       this.x = maxX;
     }
+    return this.x;
   }
   setY (y) {
     var minY = this.gameOptions.padding;
@@ -80,24 +84,32 @@ class Player {
     if (y >= maxY) {
       this.y = maxY;
     }
+    return this.y;
   }
   transform (opts) {
-
+    this.angle = opts.angle || this.angle;
+    this.setX(opts.x || this.x);
+    this.setY(opts.y || this.y);
+    this.el.attr('transform', `rotate(${this.angle}, ${this.getX()}, ${this.getY()}) translate(${this.getX()}, ${this.getY()})`);
   }
   moveAbsolute (x, y) {
-
+    this.transform(x, y);
   }
   moveRelative (dx, dy) {
-
+    this.transform({x: this.getX() + dx, y: this.getY() + dy, angle: 360 * ( Math.atan2(dy, dx) / (Math.PI() * 2) )});
   }
   setupDragging () {
-    var dragMove = this.moveRelative(d3.event.dx, d3.event.dy);
-    var drag = d3.behavior.drag().on('drag', dragMove);
+    var dragMove = function () {
+      this.moveRelative(d3.event.dx, d3.event.dy);
+    };
+    var drag = d3.drag().on('drag', dragMove);
     this.el.call(drag);
   }
 }
 
-
+var players = [];
+players.push(new Player(gameOptions).render(gameBoard));
+players.push(new Player(gameOptions).render(gameBoard));
 
 
 
