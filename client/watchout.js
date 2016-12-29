@@ -121,7 +121,7 @@ var players = [];
 players.push(new Player(gameOptions).render(gameBoard));
 
 var createEnemies = function () {
-  _.range(0, gameOptions.enemies).map(function(value) {
+  return _.range(0, gameOptions.enemies).map(function(value) {
     return {
       value: value,
       x: Math.random() * 100,
@@ -131,7 +131,7 @@ var createEnemies = function () {
 };
 
 var render = function (enemyData) {
-  
+  var enemies;
   enemies = gameBoard.selectAll('circle.enemy').data(enemyData, (data) => data.id);
   
   enemies.enter().append('svg:circle')
@@ -195,15 +195,21 @@ var render = function (enemyData) {
 
 var play = function() {
   var gameTurn = function() {
-    var newEnemyPositions = createNewEnemies();
+    var newEnemyPositions = createEnemies();
     render(newEnemyPositions); 
   };
 
   var increaseScore = function() {
-
+    gameStats.score++;
+    updateScore();
   };
+
+  gameTurn();
+  setInterval(gameTurn, 2000);
+  setInterval(increaseScore, 50);
 };
 
+play();
 
 
 
