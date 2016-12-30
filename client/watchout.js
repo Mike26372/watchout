@@ -123,7 +123,7 @@ players.push(new Player(gameOptions).render(gameBoard));
 var createEnemies = function () {
   return _.range(0, gameOptions.enemies).map(function(value) {
     return {
-      value: value,
+      id: value,
       x: Math.random() * 100,
       y: Math.random() * 100
     };
@@ -185,6 +185,7 @@ var render = function (enemyData) {
       return enemy.attr('cx', enemyNextPos.x).attr('cy', enemyNextPos.y);
     };
   };
+
   return enemies.transition()
                 .duration(500)
                 .attr('r', 10)
