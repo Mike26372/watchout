@@ -14,15 +14,16 @@
 var pi = 3.14159;
 
 var gameOptions = {
-  height: 450,
-  width: 700,
+  height: 600,
+  width: 800,
   enemies: 30,
   padding: 20
 };
 
 var gameStats = {
   score: 0,
-  bestScore: 0
+  bestScore: 0,
+  collisions: 0
 };
 
 var axes = {
@@ -44,6 +45,10 @@ var updateBestScore = function() {
   d3.select('.highscore span').text(gameStats.bestScore.toString());
 };
 
+var updateCollisionScore = function() {
+  d3.select('.collisions span').text(gameStats.collisions.toString());
+};
+
 class Player {
   constructor(gameOptions) {
     this.gameOptions = gameOptions;
@@ -53,14 +58,12 @@ class Player {
     this.y = 225;
     this.angle = 0;
     this.r = 5;
-
   }
   render (to) {
     this.el = to.append('svg:path').attr('d', this.path).attr('fill', this.fill);
     this.transform ({ x: this.gameOptions.width * 0.5, y: this.gameOptions.height * 0.5 });
     this.setupDragging();
     return this;
-    // CHECK IF ANYTHING NEEDS TO BE PASSED TO SETUPDRAGGING
   }
   getX () {
     return this.x;
@@ -103,12 +106,8 @@ class Player {
     return this.transform({x: this.getX() + dx, y: this.getY() + dy, angle: 360 * ( Math.atan2(dy, dx) / (pi * 2) )});
   }
   setupDragging () {
-    var context;
-    
-    context = window.players[0];
-    
+    var context;    
     var dragMove = function () {
-      // this.moveRelative.call(this, d3.event.dx, d3.event.dy);
       context = window.players[0];
       context.moveRelative(d3.event.dx, d3.event.dy);
     };
@@ -146,8 +145,8 @@ var render = function (enemyData) {
     return _(players).each(function(player) {
       var radiusSum, xDiff, yDiff, separation;
       radiusSum = parseFloat(enemy.attr('r')) + player.r;
-      xDiff = parseFloat(enemy.attr('x') + player.x);
-      yDiff = parseFloat(enemy.attr('y') + player.y);
+      xDiff = parseFloat(enemy.attr('cx')) - player.x;
+      yDiff = parseFloat(enemy.attr('cy')) - player.y;
 
       separation = Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2));
       if (separation < radiusSum) {
@@ -159,7 +158,9 @@ var render = function (enemyData) {
   var onCollision = function() {
     updateBestScore();
     gameStats.score = 0;
-    updateScore();
+    gameStats.collisions++;
+    updateCollisionScore();
+    return updateScore();
   };
 
   var tweenWithCollisionDetection = function (endData) {
@@ -178,10 +179,12 @@ var render = function (enemyData) {
     return function(t) {
       var enemyNextPos;
       checkCollision(enemy, onCollision);
+      
       enemyNextPos = {
         x: startPos.x + (endPos.x - startPos.x) * t,
         y: startPos.y + (endPos.y - startPos.y) * t
       };
+
       return enemy.attr('cx', enemyNextPos.x).attr('cy', enemyNextPos.y);
     };
   };
@@ -197,17 +200,17 @@ var render = function (enemyData) {
 var play = function() {
   var gameTurn = function() {
     var newEnemyPositions = createEnemies();
-    render(newEnemyPositions); 
+    return render(newEnemyPositions); 
   };
 
   var increaseScore = function() {
     gameStats.score++;
-    updateScore();
+    return updateScore();
   };
 
   gameTurn();
   setInterval(gameTurn, 2000);
-  setInterval(increaseScore, 50);
+  return setInterval(increaseScore, 50);
 };
 
 play();
